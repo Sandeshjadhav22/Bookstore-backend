@@ -4,7 +4,7 @@
   "description": "This is a ebook api",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server.ts"
   },
   "author": "sandesh <sandeshjadhav2002@gmail.com>",
   "license": "ISC",

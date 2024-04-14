@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import userModel from "./userModel";
 import { sign } from "jsonwebtoken";
 import { config } from "../config/config";
+import { User } from "./userTypes";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;
@@ -14,31 +15,44 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     //Database call
-    const user = await userModel.findOne({ email });
-    if (user) {
-        const error = createHttpError(
-            400,
-            "User Already exits with this email"
-        );
-        return next(error);
+    try {
+        const user = await userModel.findOne({ email });
+        if (user) {
+            const error = createHttpError(
+                400,
+                "User Already exits with this email"
+            );
+            return next(error);
+        }
+    } catch (err) {
+        return next(createHttpError(500, "Error while getting User"));
     }
 
     //password-hash
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await userModel.create({
-        name,
-        email,
-        password: hashedPassword,
-    });
+    let newUser: User;
+    try {
+        newUser = await userModel.create({
+            name,
+            email,
+            password: hashedPassword,
+        });
+    } catch (error) {
+        return next(createHttpError(500, "Error while creating User"));
+    }
 
-    //Token genration
-    const token = sign({ sub: newUser._id }, config.jwtSecret as string, {
-        expiresIn: "7d",
-    });
+    try {
+        //Token genration
+        const token = sign({ sub: newUser._id }, config.jwtSecret as string, {
+            expiresIn: "7d",
+        });
 
-    //response
-    res.json({ accessToken: token });
+        //response
+        res.json({ accessToken: token });
+    } catch (error) {
+        return next(createHttpError(500, "Error While signing the jwt token"));
+    }
 };
 
 export { createUser };

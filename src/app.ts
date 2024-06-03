@@ -8,7 +8,10 @@ import { config } from "./config/config";
 const app = express();
 
 app.use(cors({
-    origin: config.frontendDomain
+    origin: config.frontendDomain,
+    methods: ['POST',"GET","PUT","DELETE"],
+    credentials: true
+    
 }))
 
 app.use(express.json())

@@ -4,7 +4,9 @@
   "description": "This is a ebook api",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "build": "tsc"
+    
   },
   "author": "sandesh <sandeshjadhav2002@gmail.com>",
   "license": "ISC",
